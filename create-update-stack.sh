@@ -35,7 +35,7 @@ echo "Stack: $stack"
 
 # Check if the stack exists by attempting to describe it
 # If the stack doesn't exist, the command will return an error, so we use '|| echo -1' to handle it
-stack_exists=`aws cloudformation describe-stacks --stack-name "$stack" || echo -1`
+stack_exists=`aws cloudformation describe-stacks --stack-name "$stack" --profile "niv-test" || echo -1`
 
 # If the stack does not exist (indicated by -1), create a new one
 if test "$stack_exists" = "-1"
@@ -43,22 +43,26 @@ then
     echo "Creating a new stack: $stack"
     aws cloudformation create-stack --stack-name "$stack" \
         --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
-        --template-body file://"$stack_yml"
+        --template-body file://"$stack_yml" \
+        --profile "niv-test"
 
     # Wait for the stack creation to complete
     echo "Waiting for stack creation to complete: $stack"
-    aws cloudformation wait stack-create-complete --stack-name "$stack"
+    aws cloudformation wait stack-create-complete --stack-name "$stack" \
+    --profile "niv-test"
     status=$?
 else
     # If the stack exists, update it with the new template
     echo "Updating the stack: $stack"
     aws cloudformation update-stack --stack-name "$stack" \
         --capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
-        --template-body file://"$stack_yml"
+        --template-body file://"$stack_yml" \
+        --profile "niv-test"
 
     # Wait for the stack update to complete
     echo "Waiting for stack update to complete: $stack"
-    aws cloudformation wait stack-update-complete --stack-name "$stack"
+    aws cloudformation wait stack-update-complete --stack-name "$stack" \
+    --profile "niv-test"
     status=$?
 fi
 
