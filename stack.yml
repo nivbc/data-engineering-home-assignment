@@ -1,48 +1,103 @@
-AWSTemplateFormatVersion: "2010-09-09"
-Description: CloudFormation template to create a Lambda function that prints "Hello, World!".
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation stack to provision AWS Glue resources (DB, Job, Crawlers)
+
+Parameters:
+  ScriptLocation: s3://data-engineer-assignment-nivbc/scripts/process_data.py
+    Type: String
+    Description: S3 path to the Glue ETL script (e.g. s3://your-bucket/scripts/process_data.py)
 
 Resources:
-    LambdaExecutionRole:
-        Type: "AWS::IAM::Role"
-        Properties:
-            AssumeRolePolicyDocument:
-                Version: "2012-10-17"
-                Statement:
-                    - Effect: "Allow"
-                      Principal:
-                          Service:
-                              - "lambda.amazonaws.com"
-                      Action: "sts:AssumeRole"
-            Policies:
-                - PolicyName: "LambdaExecutionPolicy"
-                  PolicyDocument:
-                      Version: "2012-10-17"
-                      Statement:
-                          - Effect: "Allow"
-                            Action:
-                                - "logs:CreateLogGroup"
-                                - "logs:CreateLogStream"
-                                - "logs:PutLogEvents"
-                            Resource: "arn:aws:logs:*:*:*"
 
-    HelloWorldLambda:
-        Type: "AWS::Lambda::Function"
-        Properties:
-            FunctionName: "HelloWorldFunction"
-            Handler: "index.handler"
-            Role: !GetAtt LambdaExecutionRole.Arn
-            Runtime: "python3.9"
-            Code:
-                ZipFile: |
-                    def handler(event, context):
-                        print("Hello, World!")
-            Timeout: 30
-            MemorySize: 128
+  GlueServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: glue-service-role-niv
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: glue.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
+        - arn:aws:iam::aws:policy/AmazonAthenaFullAccess
 
-Outputs:
-    LambdaFunctionName:
-        Description: "Name of the Lambda function created"
-        Value: !Ref HelloWorldLambda
-    LambdaExecutionRoleArn:
-        Description: "ARN of the Lambda execution role"
-        Value: !GetAtt LambdaExecutionRole.Arn
+  GlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: vi_data_db
+
+  GlueJob:
+    Type: AWS::Glue::Job
+    Properties:
+      Name: process-data-job-niv
+      Role: !GetAtt GlueServiceRole.Arn
+      Command:
+        Name: glueetl
+        ScriptLocation: !Ref ScriptLocation
+        PythonVersion: 3
+      GlueVersion: "4.0"
+      DefaultArguments:
+        "--TempDir": !Sub "s3://data-engineer-assignment-niv/temp/"
+        "--enable-metrics": "true"
+      MaxRetries: 0
+      Timeout: 10
+      NumberOfWorkers: 2
+      WorkerType: G.1X
+
+  GlueCrawlerAvgDailyStock:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: output-crawler-AvgDailyStock
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub "s3://data-engineer-assignment-niv/output/AvgDailyStock/"
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+
+  GlueCrawlerHighestWorth:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: output-crawler-HighestWorth
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub "s3://data-engineer-assignment-niv/output/HighestWorth/"
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+
+  GlueCrawlerStockStd:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: output-crawler-StockStd
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub "s3://data-engineer-assignment-niv/output/StockStd/"
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
+
+  GlueCrawlerTopThree:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: output-crawler-TopThree
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueDatabase
+      Targets:
+        S3Targets:
+          - Path: !Sub "s3://data-engineer-assignment-niv/output/TopThree/"
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
