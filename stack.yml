@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation stack to provision AWS Glue resources (DB, Job, Crawlers)
 
 Parameters:
-  ScriptLocation: s3://data-engineer-assignment-nivbc/scripts/process_data.py
+  ScriptLocation: s3://data-engineer-assignment-nivbc/scripts/stock_etl_pipeline.py
     Type: String
     Description: S3 path to the Glue ETL script (e.g. s3://your-bucket/scripts/process_data.py)
 
