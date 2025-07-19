@@ -45,6 +45,18 @@ Resources:
       Timeout: 10
       NumberOfWorkers: 2
       WorkerType: G.1X
+  GlueCrawlerRawData:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: input-crawler-RawData
+      Role: !GetAtt GlueServiceRole.Arn
+      DatabaseName: !Ref GlueDatabase
+      Targets:
+        S3Targets:
+          - Path: "s3://data-engineer-assignment-nivbc/rawData/"
+      SchemaChangePolicy:
+        UpdateBehavior: UPDATE_IN_DATABASE
+        DeleteBehavior: DEPRECATE_IN_DATABASE
 
   GlueCrawlerAvgDailyStock:
     Type: AWS::Glue::Crawler
