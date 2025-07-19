@@ -35,7 +35,7 @@ Resources:
       Command:
         Name: glueetl
         ScriptLocation: "s3://data-engineer-assignment-niv/scripts/stock_etl_pipeline.py"
-        PythonVersion: 3
+      PythonVersion: 3
       GlueVersion: "4.0"
       DefaultArguments:
         "--TempDir": "s3://data-engineer-assignment-niv/temp/"
@@ -45,7 +45,7 @@ Resources:
       Timeout: 10
       NumberOfWorkers: 2
       WorkerType: G.1X
-      
+
   GlueCrawlerRawData:
     Type: AWS::Glue::Crawler
     Properties:
