@@ -72,6 +72,8 @@ Resources:
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
+      Schedule:
+        ScheduleExpression: "cron(10,22 0 * * ? *)"  # twice a day
 
   GlueCrawlerStockStd:
     Type: AWS::Glue::Crawler
@@ -85,6 +87,8 @@ Resources:
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
+      Schedule:
+        ScheduleExpression: "cron(10,22 0 * * ? *)"  # twice a day
 
   GlueCrawlerTopThree:
     Type: AWS::Glue::Crawler
@@ -98,3 +102,5 @@ Resources:
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
+      Schedule:
+        ScheduleExpression: "cron(10,22 0 * * ? *)"  # twice a day
