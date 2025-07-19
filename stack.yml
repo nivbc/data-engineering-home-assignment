@@ -34,11 +34,11 @@ Resources:
       Role: !GetAtt GlueServiceRole.Arn
       Command:
         Name: glueetl
-        ScriptLocation: s3://data-engineer-assignment-nivbc/scripts/stock_etl_pipeline.py
+        ScriptLocation: s3://data-engineer-assignment-niv/scripts/stock_etl_pipeline.py
         PythonVersion: 3
       GlueVersion: "4.0"
       DefaultArguments:
-        "--TempDir": s3://data-engineer-assignment-nivbc/temp/
+        "--TempDir": s3://data-engineer-assignment-niv/temp/
         "--enable-metrics": "true"
       MaxRetries: 0
       Timeout: 10
@@ -53,10 +53,12 @@ Resources:
       DatabaseName: !Ref GlueDatabase
       Targets:
         S3Targets:
-          - Path: s3://data-engineer-assignment-nivbc/processedData/AvgDailyStock/
+          - Path: s3://data-engineer-assignment-niv/processedData/AvgDailyStock/
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
+      Schedule:
+        ScheduleExpression: "cron(10,22 0 * * ? *)"  # twice a day
 
   GlueCrawlerHighestWorth:
     Type: AWS::Glue::Crawler
@@ -66,7 +68,7 @@ Resources:
       DatabaseName: !Ref GlueDatabase
       Targets:
         S3Targets:
-          - Path: s3://data-engineer-assignment-nivbc/processedData/HighestWorth/
+          - Path: s3://data-engineer-assignment-niv/processedData/HighestWorth/
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
@@ -79,7 +81,7 @@ Resources:
       DatabaseName: !Ref GlueDatabase
       Targets:
         S3Targets:
-          - Path: s3://data-engineer-assignment-nivbc/processedData/StockStd/
+          - Path: s3://data-engineer-assignment-niv/processedData/StockStd/
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
@@ -92,7 +94,7 @@ Resources:
       DatabaseName: !Ref GlueDatabase
       Targets:
         S3Targets:
-          - Path: s3://data-engineer-assignment-nivbc/processedData/TopThree/
+          - Path: s3://data-engineer-assignment-niv/processedData/TopThree/
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
