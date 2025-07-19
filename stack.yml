@@ -39,6 +39,7 @@ Resources:
       GlueVersion: "4.0"
       DefaultArguments:
         "--TempDir": "s3://data-engineer-assignment-niv/temp/"
+        "--output_path": "s3://data-engineer-assignment-niv/processedData/"
         "--enable-metrics": "true"
       MaxRetries: 0
       Timeout: 10
