@@ -1,11 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation stack to provision AWS Glue resources (DB, Job, Crawlers)
 
-Parameters:
-  ScriptLocation: s3://data-engineer-assignment-nivbc/scripts/stock_etl_pipeline.py
-    Type: String
-    Description: S3 path to the Glue ETL script (e.g. s3://your-bucket/scripts/process_data.py)
-
 Resources:
 
   GlueServiceRole:
@@ -39,11 +34,11 @@ Resources:
       Role: !GetAtt GlueServiceRole.Arn
       Command:
         Name: glueetl
-        ScriptLocation: !Ref ScriptLocation
+        ScriptLocation: s3://data-engineer-assignment-nivbc/scripts/stock_etl_pipeline.py
         PythonVersion: 3
       GlueVersion: "4.0"
       DefaultArguments:
-        "--TempDir": !Sub "s3://data-engineer-assignment-niv/temp/"
+        "--TempDir": s3://data-engineer-assignment-nivbc/temp/
         "--enable-metrics": "true"
       MaxRetries: 0
       Timeout: 10
@@ -58,7 +53,7 @@ Resources:
       DatabaseName: !Ref GlueDatabase
       Targets:
         S3Targets:
-          - Path: !Sub "s3://data-engineer-assignment-niv/output/AvgDailyStock/"
+          - Path: s3://data-engineer-assignment-nivbc/processedData/AvgDailyStock/
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
@@ -71,7 +66,7 @@ Resources:
       DatabaseName: !Ref GlueDatabase
       Targets:
         S3Targets:
-          - Path: !Sub "s3://data-engineer-assignment-niv/output/HighestWorth/"
+          - Path: s3://data-engineer-assignment-nivbc/processedData/HighestWorth/
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
@@ -84,7 +79,7 @@ Resources:
       DatabaseName: !Ref GlueDatabase
       Targets:
         S3Targets:
-          - Path: !Sub "s3://data-engineer-assignment-niv/output/StockStd/"
+          - Path: s3://data-engineer-assignment-nivbc/processedData/StockStd/
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
@@ -97,7 +92,7 @@ Resources:
       DatabaseName: !Ref GlueDatabase
       Targets:
         S3Targets:
-          - Path: !Sub "s3://data-engineer-assignment-niv/output/TopThree/"
+          - Path: s3://data-engineer-assignment-nivbc/processedData/TopThree/
       SchemaChangePolicy:
         UpdateBehavior: UPDATE_IN_DATABASE
         DeleteBehavior: DEPRECATE_IN_DATABASE
