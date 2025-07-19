@@ -45,6 +45,7 @@ Resources:
       Timeout: 10
       NumberOfWorkers: 2
       WorkerType: G.1X
+      
   GlueCrawlerRawData:
     Type: AWS::Glue::Crawler
     Properties:
